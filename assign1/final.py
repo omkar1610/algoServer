@@ -70,7 +70,7 @@ class Graph:
                 self.bfs(i)
 
                 
-    def show_bipartite(self):
+    def prob_3(self): # show_bipartite
         if self.bipartite:
             print("Yes !! Bipartite Levels : ", end = "")
             level = [i%2 for i in self.level[1:]]
@@ -95,7 +95,7 @@ class Graph:
             v = self.parent[v]
         return path[::-1]
 
-    def print_cycle(self):
+    def prob_2(self): # Print Cycle
         if self.cycle:
             print("Yes !!\nCycle Exists : ", end = "")
             l1, l2 = self.show_path_root(self.pair_cycle[0]), self.show_path_root(self.pair_cycle[1])
@@ -119,11 +119,11 @@ def assign1(input):
     # print("\nisBipartite :", g.bipartite, "\t\thasCycle : ", g.cycle, 
     #       "\nBipartite Pair : ", g.pair_bipartite, "\tCycle Pair : ", g.pair_cycle )
     print("\n\nProblem 2 : Cycle")
-    g.print_cycle()
+    g.prob_2()
     print("\n\nProblem 3 : Bipartite")
-    g.show_bipartite()
+    g.prob_3()
 
-if __name__ == '__main__': # can use code in this file via import (?)
+if  # show_bipartite__name__ == '__main__': # can use code in this file via import (?)
     if len(sys.argv) != 2 : # == argc
         # Note the printf-like syntax below
         sys.exit('Usage: %s <input file name>' % sys.argv[0])            
