@@ -123,7 +123,7 @@ def assign1(input):
     print("\n\nProblem 3 : Bipartite")
     g.prob_3()
 
-if  # show_bipartite__name__ == '__main__': # can use code in this file via import (?)
+if  __name__ == '__main__':
     if len(sys.argv) != 2 : # == argc
         # Note the printf-like syntax below
         sys.exit('Usage: %s <input file name>' % sys.argv[0])            
