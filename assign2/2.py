@@ -1,79 +1,137 @@
-def choose_optimal(n, m):
-    return n if n<=m else n%(m+1) if n%(m+1)!=0 else 1
 
-k = int(input("k : "))
+import random
 
-bins = [[k]]
-win = 0
-total = 0
-for _ in range(k):
-    n, m = map(int, input("n and m :").split())
-    total += n
-    if n%(m+1) != 0:
-        bins.append([n, m, True])
-        win += 1
-    else:
-        bins.append([n, m, False])
-print(bins, win)
+def bit_xor(split):
+    res = 0
+    for i in split:
+        for j in i:
+            res = res^j
+    return res
 
-turn = 'u'
-index, no = 0, 0
-while total>0:
+def update_bin(bins, index, draw):
+    bins[index][1] -= draw
+    if bins[index][1] == 0:
+        bins.pop(index)
+
+def choose_random(bins):
+    k = len(bins)-1
+    index = random.randint(0,k)
+    while(bins[index][1] == 0):
+        index = random.randint(0,k)
+
+    m, n = bins[index][0], bins[index][1]
+    draw = random.randint(1, min(m, n))
+    return index, draw
+
+def optimal_draw(split, nim_sum):
+    for i in range(len(split)):
+        for j in range(len(split[i])):
+            tmp = split[i][j]
+            if (tmp^nim_sum) < tmp:
+
+                comp_n = tmp - (tmp^nim_sum)
+                return i, comp_n
+
+def isvalid_input(bins, index, draw):
+    k = len(bins)
+    if index-1 not in range(0, k):
+        print("Index out of range.", end = " ")
+        return True
+
+    m = bins[index-1][0]
+    n = bins[index-1][1]
+    if draw not in range(1, 1+min(m,n)):
+       
+        print("Can't draw these many.", end = " ")
+        return True
+    return False
+       
+def take_input(bins):
+    k = int(input("k : "))
+    total = 0
+    for _ in range(k):
+        n, m = map(int, input("n and m :").split())
+        total += n
+        bins.append([m, n])
+    return total
+
+def splitted_bins(bins):
+    split = []
+    for i in bins:
+        m, n = i[0], i[1]
+        tmp = [m] * (n//m)
+        if n%m != 0:
+            tmp.append(n%m) 
+        split.append(tmp)
+    return split
+
+def random_inputs(bins):
+    k = random.randint(2,20)
+    total = 0
+    for _ in range(k):
+        n = random.randint(1, 200)
+        k = random.randint(0, 3)
+        m = random.randint(1, n) if k != 3 else random.randint(n+1, n+10)
+        total += n
+        bins.append([m, n])
+    return total
+
+def show(bins, total):
+    print("Balls Left: ", total, end = " ,Bins(limit): ")
+    for i in bins:
+        print('{}({})'.format(i[1], i[0]), end = " ")
+
+    print("\n")
+
+
+def game():
+    bins = []
+    total = take_input(bins)
+    # total = random_inputs(bins)
+    show(bins, total)
+
+    turn = 'u'
+
+    while(total):
+
+        if turn == 'u':
+            index, draw = map(int, input("Enter your move user(index, draw) : ").split(" "))
+
+            while isvalid_input(bins, index, draw):
+                index, draw = map(int, input("Invalid Entry!!Enter your move user(index, draw) : ").split(" "))
+
+            update_bin(bins, index-1, draw)
+            print("\nUser removed", index, draw)
+            total -= draw
+            show(bins, total)
+
+            # print(bins)
+            turn = 'c'
+        else:
+            split = splitted_bins(bins)
+            nim_sum = bit_xor(split)
+
+            if nim_sum != 0:
+                index, draw = optimal_draw(split, nim_sum)
+                update_bin(bins, index, draw)
+                print("\nComp removed", index+1, draw)
+
+                total -= draw
+                show(bins, total)
+            else:
+                index, draw = choose_random(bins)
+                update_bin(bins, index, draw)
+                print("\nComp removed", index+1, draw)
+
+                total -= draw
+                show(bins, total)
+            # print(total, bins)
+            turn = 'u'
+
+    # Result
     if turn == 'u':
-        index, no = map(int, input("Enter index & no : ").split())
-        while index<1 or index >k or no <=0 or no>bins[index][0] or no >bins[index][1]:
-            index, no = map(int, input("Invalid Entry!Enter again : ").split())
-            
-        bins[index][0] -= no
-        total -= no
-        
-        if bins[index][0] == 0:
-            bins[0][0] -= 1
-#         print([i[0] for i in bins[1:]])
-        print(bins, win)
-        if bins[0][0] == 0:
-            print("User Won")
-        turn = 'c'
+        print("\nYES")
     else:
-#         User picked and now update true false and win count
-        if bins[index][0]%(bins[index][1]+1) == 0:
-            if bins[index][2] == True:
-                win -= 1
-            bins[index][2] = False
-        else:
-            if bins[index][2] == False:
-                win += 1
-            bins[index][2] = True
-#         If win == n , Comp will win, So choose any thing, Doesn't matter
-        if win == n or win == 0:
-#             Choose any bin and pick
-            for i in range(1, k+1):
-                if bins[i][0]>0:
-                    break
-            t = choose_optimal(bins[i][0], bins[i][1])
-            bins[i][0] -= t
-            total -= t
-            
-            if bins[i][0] == 0:
-                bins[0][0] -= 1
+        print("\nNOn")
 
-#         If win ==0, Comp will loose, So choose random same as before
-
-#         Choose any win bin and pick
-        else:
-            for i in range(1, k+1):
-                if bins[i][0]>0 and bins[i][2] == True:
-                    break
-            t = choose_optimal(bins[i][0], bins[i][1])
-            bins[i][0] -= t
-            total -= t
-            
-            if bins[i][0] == 0:
-                bins[0][0] -= 1
-        
-#         print([i[0] for i in bins[1:]])
-        print(bins, win)
-        if bins[0][0] == 0:
-            print("Comp Won")
-        turn = 'u'
-    
+game()

@@ -8,21 +8,19 @@ turn = 'u'
 while n>0:
     if turn == 'u':
         t = int(input("User Enter the number : "))
-        while t<=0 or t>m or t>n:
+        while t not in range(1, 1+min(m,n)):
             t = int(input("Invalid input! Enter again: "))
-#         t = n if n<=m else n%(m+1) if n%(m+1)!=0 else 1
-#         print("User chose", t)
         
         n -= t
-        print("Left coins =",n)
+        print("Coins Left=",n, end = " ,")
         if n==0:
-            print("User Won")
+            print("NO")
         turn = 'c'
     else:
-        t = n if n<=m else n%(m+1) if n%(m+1)!=0 else 1
-        print("Computer chose", t)
+        t = n if n<=m else n%(m+1) if n%(m+1)!=0 else min(m,n)
+        print("Computer chose", t, end = " ,")
         n -= t
         print("Left coins =",n)
         if n==0:
-            print("Computer Won")
+            print("YES")
         turn = 'u'
